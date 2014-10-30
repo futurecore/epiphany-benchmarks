@@ -1,0 +1,28 @@
+language: c
+
+compiler: gcc
+
+before_install:
+    - sudo apt-get update -qq
+    - sudo apt-get -qq install build-essential
+    - sudo apt-get -qq install bison flex libgmp-dev libncurses-dev libmpc-dev libmpfr-dev texinfo xzip lzip
+    - sudo apt-get -qq install gcc-arm-linux-gnueabihf
+    - sudo apt-get -qq install g++-arm-linux-gnueabihf
+
+script:
+    - cd $HOME
+    - mkdir epiphany-sdk
+    - export EPIPHANY_BUILD_HOME=$HOME/epiphany-sdk
+    - cd epiphany-sdk
+    - git clone https://github.com/adapteva/epiphany-sdk.git sdk
+    - cd sdk
+    - ./download-toolchain.sh --clone
+    - sudo ./build-toolchain.sh --host arm-linux-gnueabihf
+    - ./build-epiphany-sdk.sh --host arm-linux-gnueabihf || tail build-*.log # Helps with debugging.
+    - export PATH=/opt/adapteva/esdk/tools/e-gnu/bin:$PATH
+    - source ./setup.sh
+    # Build epiphany-examples repo, just as a proof of concept.
+    - cd $EPIPHANY_BUILD_HOME
+    - git clone https://github.com/adapteva/epiphany-examples.git
+    - cd epiphany-examples/scripts
+    - ./build_all.sh
