@@ -12,7 +12,7 @@ before_install:
 script:
     - cd $HOME
     - sudo mkdir -p /opt/adapteva
-    - sudo chown travisuser:travisgroup /opt/adapteva
+    - sudo chown $USER:$USER /opt/adapteva
     - unset EPIPHANY_BUILD_HOME
     - mkdir buildroot
     - cd buildroot
