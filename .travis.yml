@@ -11,6 +11,8 @@ before_install:
 
 script:
     - cd $HOME
+    - mkdir -p /opt/adapteva
+    - chown travisuser:travisgroup /opt/adapteva
     - unset EPIPHANY_BUILD_HOME
     - mkdir buildroot
     - cd buildroot
