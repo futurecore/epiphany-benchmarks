@@ -15,7 +15,7 @@ script:
     - mkdir buildroot
     - cd buildroot
     - git clone https://github.com/adapteva/epiphany-sdk sdk --branch 2014.11
-    - ./sdk/build-epiphany-sdk.sh -c arm-linux-gnueabihf -C
+    - ./sdk/build-epiphany-sdk.sh -c arm-linux-gnueabihf -C || tail /home/travis/buildroot/logs/2014.11-rc1/build-2014-11-03-1550.log
     # Build epiphany-examples repo, just as a proof of concept.
     - cd $HOME
     - git clone https://github.com/adapteva/epiphany-examples.git
