@@ -11,18 +11,13 @@ before_install:
 
 script:
     - cd $HOME
-    - mkdir epiphany-sdk
-    - export EPIPHANY_BUILD_HOME=$HOME/epiphany-sdk
-    - cd epiphany-sdk
-    - git clone https://github.com/adapteva/epiphany-sdk.git sdk
-    - cd sdk
-    - ./download-toolchain.sh --clone
-    - sudo ./build-toolchain.sh --host arm-linux-gnueabihf
-    - export PATH=$EPIPHANY_BUILD_HOME/INSTALL/bin:/opt/adapteva/esdk/tools/e-gnu/bin:$PATH
-    - ./build-epiphany-sdk.sh --host arm-linux-gnueabihf || tail build-*.log # Helps with debugging.
-    - ./install-sdk.sh --host arm-linux-gnueabihf -p /opt/adapteva
+    - unset EPIPHANY_BUILD_HOME
+    - mkdir buildroot
+    - cd buildroot
+    - git clone https://github.com/adapteva/epiphany-sdk sdk --branch 2014.11
+    - ./sdk/build-epiphany-sdk.sh -c arm-linux-gnueabihf -C
     # Build epiphany-examples repo, just as a proof of concept.
-    - cd $EPIPHANY_BUILD_HOME
+    - cd $HOME
     - git clone https://github.com/adapteva/epiphany-examples.git
     - cd epiphany-examples/scripts
     - ./build_all.sh
