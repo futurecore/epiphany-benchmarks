@@ -1,27 +1,29 @@
 language: c
 
-compiler: gcc
-
-cache: apt
+env:
+    global:
+        - "HOST_IP=$(/sbin/ifconfig venet0:0 | grep 'inet addr' | awk -F: '{print $2}' | awk '{print $1}')"
+        - DOCKER_HOST=tcp://$HOST_IP:2375
+        - DOCKER_PORT_RANGE=2400:2500
+        - SLIRP_PORTS=$(seq 2375 2500)
 
 before_install:
-    - sudo apt-get update -qq
-    - sudo apt-get -qq install build-essential
-    - sudo apt-get -qq install bison flex libgmp-dev libncurses-dev libmpc-dev libmpfr-dev texinfo xzip lzip
-    - sudo apt-get -qq install gcc-arm-linux-gnueabihf
-    - sudo apt-get -qq install g++-arm-linux-gnueabihf
+    - sudo sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"
+    - sudo sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
+    - echo exit 101 | sudo tee /usr/sbin/policy-rc.d
+    - sudo chmod +x /usr/sbin/policy-rc.d
+
+install:
+    - sudo apt-get -qqy update
+    - sudo apt-get -qqy install lxc lxc-docker-1.2.0 slirp
+    - sudo sudo usermod -aG docker "$USER"
+    - git clone git://github.com/cptactionhank/sekexe
+
+before_script:
+    - "sekexe/run 'mount -t tmpfs -o size=8g tmpfs /var/lib/docker && docker -d -H tcp://0.0.0.0:2375' &"
+    - "while ! docker info &> /dev/null ; do sleep 1; done"
+    - docker pull snim2/parallella-devenv
 
 script:
-    - cd $HOME
-    - sudo mkdir -p /opt/adapteva
-    - sudo chown $USER:$USER /opt/adapteva
-    - unset EPIPHANY_BUILD_HOME
-    - mkdir buildroot
-    - cd buildroot
-    - git clone https://github.com/adapteva/epiphany-sdk sdk --branch 2014.11
-    - ./sdk/build-epiphany-sdk.sh -c arm-linux-gnueabihf -C || tail /home/travis/buildroot/logs/2014.11-rc1/build-2014-11-03-1550.log
-    # Build epiphany-examples repo, just as a proof of concept.
-    - cd $HOME
-    - git clone https://github.com/adapteva/epiphany-examples.git
-    - cd epiphany-examples/scripts
-    - ./build_all.sh
+    - docker version
+    - docker run -t snim2/epiphany-benchmarks sh -c "cd /home/dev/working/epiphany-benchmarks/src; make"
