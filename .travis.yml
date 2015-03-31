@@ -26,4 +26,4 @@ before_script:
 
 script:
     - docker version
-    - docker run -t snim2/epiphany-benchmarks sh -c "cd /home/dev/working/epiphany-benchmarks/src; make"
+    - docker run -t snim2/epiphany-benchmarks sh -c "cd /home/dev ; wget https://raw.githubusercontent.com/futurecore/epiphany-benchmarks/master/docker-update.sh ; sh docker-update.sh ; cd /home/dev/working/epiphany-benchmarks/src; make"
